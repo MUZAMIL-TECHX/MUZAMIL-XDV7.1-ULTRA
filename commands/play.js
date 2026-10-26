@@ -1,6 +1,9 @@
 const axios = require('axios');
 const yts = require('yt-search');
 
+// ═══════════════════════════════════════════════════════════
+//                    🎯 CHANNEL INFO (FORWARD ON)
+// ═══════════════════════════════════════════════════════════
 const channelInfo = {
     contextInfo: {
         forwardingScore: 1,
@@ -16,6 +19,9 @@ const channelInfo = {
 const API_BASE = 'https://arslan-apis-v2.vercel.app/download/ytmp3?url=';
 const MAX_AUDIO_BYTES = 64 * 1024 * 1024;
 
+// ═══════════════════════════════════════════════════════════
+//                    🛠️ HELPERS & VIP DESIGN
+// ═══════════════════════════════════════════════════════════
 async function addReaction(sock, message, emoji) {
     try {
         await sock.sendMessage(message.key.remoteJid, {
@@ -73,7 +79,7 @@ function streamHttpError(status) {
     const reason = status === 404
         ? 'the link may be short-lived or invalid'
         : status === 403
-            ? 'the provider denied access'
+            ? 'the provider denied access (Bypassed using Proxy)'
             : 'the provider could not find the audio';
     const error = new Error(`Audio host returned HTTP ${status}; ${reason}.`);
     error.statusCode = status;
@@ -92,6 +98,9 @@ function isYouTubeUrl(value) {
     }
 }
 
+// ═══════════════════════════════════════════════════════════
+//                    🎵 FETCH API
+// ═══════════════════════════════════════════════════════════
 async function getArslanData(youtubeUrl) {
     let response;
     try {
@@ -132,18 +141,24 @@ async function getArslanData(youtubeUrl) {
     };
 }
 
+// ═══════════════════════════════════════════════════════════
+//                    📥 ULTRA FAST BUFFER (PROXY BYPASS)
+// ═══════════════════════════════════════════════════════════
 async function downloadBuffer(url) {
+    // 🔥 Proxy Bypass for Railway (Fixes 123tokyo 403 Error)
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+
     let response;
     try {
-        response = await axios.get(url, {
+        response = await axios.get(proxyUrl, {
             responseType: 'arraybuffer',
-            timeout: 60000,
+            timeout: 90000, // 1.5 Mins
             maxRedirects: 3,
             maxContentLength: MAX_AUDIO_BYTES,
             maxBodyLength: MAX_AUDIO_BYTES,
             headers: {
-                'User-Agent': 'Mozilla/5.0',
-                Accept: 'audio/mpeg, audio/*;q=0.9, application/octet-stream;q=0.8'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Accept': '*/*'
             },
             validateStatus: () => true
         });
@@ -164,7 +179,7 @@ async function downloadBuffer(url) {
 
     const contentType = String(response.headers?.['content-type'] || '').toLowerCase();
     if (/text\/html|application\/json|text\/plain/.test(contentType)) {
-        throw new Error('Audio host returned a webpage/error response instead of MP3 audio. The link may have expired; request a fresh link from the provider.');
+        throw new Error('Audio host returned a webpage instead of MP3 audio. The link may have expired.');
     }
 
     const buffer = Buffer.from(response.data || []);
@@ -173,6 +188,9 @@ async function downloadBuffer(url) {
     return buffer;
 }
 
+// ═══════════════════════════════════════════════════════════
+//                    🖼️ SEND INFO
+// ═══════════════════════════════════════════════════════════
 async function sendInfo(sock, chatId, message, video, apiData) {
     if (!video.thumbnail) return;
     try {
@@ -184,15 +202,18 @@ async function sendInfo(sock, chatId, message, video, apiData) {
                 `📺 ᴄʜᴀɴɴᴇʟ : ${trim(video.author?.name || video.author, 25)}`,
                 `🎚️ ǫᴜᴀʟɪᴛʏ : ${apiData.quality}`,
                 '━━━━━━━━━━━━━━━━━━',
-                '📥 ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴀᴜᴅɪᴏ...'
+                '⚡ ᴜʟᴛʀᴀ ꜰᴀꜱᴛ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ...'
             ]),
             ...channelInfo
         }, { quoted: message });
     } catch {
-        // The thumbnail is optional; audio delivery should continue.
+        // Thumbnail optional
     }
 }
 
+// ═══════════════════════════════════════════════════════════
+//                    🚀 MAIN PLAY COMMAND
+// ═══════════════════════════════════════════════════════════
 async function playCommand(sock, chatId, message) {
     try {
         await addReaction(sock, message, '🎵');
@@ -211,6 +232,8 @@ async function playCommand(sock, chatId, message) {
         }
 
         await addReaction(sock, message, '🔍');
+        
+        // 1. YouTube Search
         let video;
         if (isYouTubeUrl(query)) {
             video = { url: query, title: 'YouTube Audio', timestamp: 'N/A', author: 'Unknown' };
@@ -232,22 +255,27 @@ async function playCommand(sock, chatId, message) {
         }
 
         await addReaction(sock, message, '⏳');
+
+        // 2. Fetch API
         let apiData = await getArslanData(video.url);
+        
         await addReaction(sock, message, '📥');
 
-        // Download signed URLs before sending the optional thumbnail, since
-        // some providers issue links with a short lifetime.
+        // 3. Ultra Fast Download (Proxy)
         let audioBuffer;
         try {
             audioBuffer = await downloadBuffer(apiData.audio);
         } catch (error) {
-            if (error.statusCode !== 404) throw error;
-            // Ask the provider for one fresh link; do not proxy or bypass access controls.
+            if (error.statusCode !== 404 && error.statusCode !== 403) throw error;
+            // Ask provider for one fresh link
             apiData = await getArslanData(video.url);
             audioBuffer = await downloadBuffer(apiData.audio);
         }
 
+        // 4. Send Thumbnail
         await sendInfo(sock, chatId, message, video, apiData);
+
+        // 5. Send Audio
         await sock.sendMessage(chatId, {
             audio: audioBuffer,
             mimetype: 'audio/mpeg',
@@ -255,7 +283,9 @@ async function playCommand(sock, chatId, message) {
             ptt: false,
             ...channelInfo
         }, { quoted: message });
+        
         await addReaction(sock, message, '✅');
+
     } catch (error) {
         console.error('Play command failed:', error.code || error.message);
         await addReaction(sock, message, '❌');
