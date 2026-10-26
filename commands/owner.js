@@ -56,7 +56,6 @@ async function ownerCommand(sock, chatId, message) {
 
 ▸ 👤 ɴᴀᴍᴇ : ${name}
 ▸ 📱 ɴᴜᴍʙᴇʀ : ${number}
-▸ 📢 ʜᴀɴᴅʟᴇ : @Muzamil
 
 ━━━━━━━━━━━━━━━━━━━━
 ▸ 🔗 ᴡʜᴀᴛꜱᴀᴘᴘ ᴄʜᴀɴɴᴇʟ :
