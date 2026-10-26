@@ -11,7 +11,6 @@ const channelInfo = {
     }
 };
 
-const ARSLAN_API = 'https://arslan-apis-v2.vercel.app/download/ytmp3?url=';
 const HECTOR_API = 'https://yt-dl.officialhectormanuel.workers.dev/?url=';
 
 // ═══════════════════════════════════════════════════════════
@@ -52,8 +51,8 @@ async function searchSong(query) {
 
     const v = videos[0];
     return {
-        url: v.url,
         title: v.title,
+        url: v.url,
         thumbnail: v.thumbnail,
         timestamp: v.timestamp,
         author: v.author?.name || 'Unknown'
@@ -61,28 +60,7 @@ async function searchSong(query) {
 }
 
 // ═══════════════════════════════════════════════════════════
-//                    🎵 ARSLAN API (For Thumbnail & Info)
-// ═══════════════════════════════════════════════════════════
-async function getArslanData(youtubeUrl) {
-    const apiUrl = `${ARSLAN_API}${encodeURIComponent(youtubeUrl)}`;
-    const response = await axios.get(apiUrl, {
-        timeout: 30000,
-        headers: { 'User-Agent': 'Mozilla/5.0' }
-    });
-
-    if (!response.data?.status || !response.data?.result?.metadata) {
-        throw new Error('Arslan API failed');
-    }
-
-    const result = response.data.result;
-    return {
-        title: result.metadata?.title || 'Audio',
-        quality: result.metadata?.quality || '128k'
-    };
-}
-
-// ═══════════════════════════════════════════════════════════
-//                    🎧 HECTOR API (For Audio Download)
+//                    🎵 HECTOR API
 // ═══════════════════════════════════════════════════════════
 async function getHectorData(youtubeUrl) {
     const apiUrl = `${HECTOR_API}${encodeURIComponent(youtubeUrl)}`;
@@ -124,7 +102,7 @@ async function downloadBuffer(url) {
 }
 
 // ═══════════════════════════════════════════════════════════
-//                    🚀 MAIN SONG COMMAND
+//                    🚀 MAIN SONG COMMAND (ULTRA FAST)
 // ═══════════════════════════════════════════════════════════
 async function songCommand(sock, chatId, message) {
     try {
@@ -140,7 +118,8 @@ async function songCommand(sock, chatId, message) {
             return await sock.sendMessage(chatId, {
                 text: box('🎵 ꜱᴏɴɢ ᴅʟ', [
                     '📌 ᴜꜱᴀɢᴇ : .ꜱᴏɴɢ [ɴᴀᴍᴇ/ʟɪɴᴋ]',
-                    '🔍 ᴇxᴀᴍᴘʟᴇ : .ꜱᴏɴɢ ᴘᴀꜱᴏᴏʀɪ'
+                    '🔍 ᴇxᴀᴍᴘʟᴇ : .ꜱᴏɴɢ ᴘᴀꜱᴏᴏʀɪ',
+                    '⚡ ᴍᴏᴅᴇ : ᴜʟᴛʀᴀ ꜰᴀꜱᴛ'
                 ]),
                 ...channelInfo
             }, { quoted: message });
@@ -165,16 +144,12 @@ async function songCommand(sock, chatId, message) {
         await addReaction(sock, message, '⏳');
 
         // ═══════════════════════════════════════
-        // STEP 2: FETCH INFO (ARSLAN) & AUDIO (HECTOR) PARALLEL
+        // STEP 2: HECTOR API (Get Audio Link)
         // ═══════════════════════════════════════
-        
-        // Dono APIs ko ek sath call karein taake time bache
-        const [arslanInfo, hectorData] = await Promise.all([
-            getArslanData(songData.url).catch(() => ({ title: songData.title, quality: '128k' })), // Fallback to yt-search
-            getHectorData(songData.url).catch(() => null)
-        ]);
-
-        if (!hectorData || !hectorData.audio) {
+        let hectorData;
+        try {
+            hectorData = await getHectorData(songData.url);
+        } catch (apiError) {
             await addReaction(sock, message, '❌');
             return await sock.sendMessage(chatId, {
                 text: box('❌ ᴀᴘɪ ꜰᴀɪʟᴇᴅ', [
@@ -186,22 +161,21 @@ async function songCommand(sock, chatId, message) {
         }
 
         // ═══════════════════════════════════════
-        // STEP 3: THUMBNAIL + START DOWNLOAD (PARALLEL)
+        // STEP 3: THUMBNAIL (INSTANT) + START DOWNLOAD (PARALLEL)
         // ═══════════════════════════════════════
         await addReaction(sock, message, '🖼️');
 
-        // Start buffer download in background
+        // Start buffer download in background (Fatak se start)
         const bufferPromise = downloadBuffer(hectorData.audio);
 
-        // Send thumbnail using Arslan info
+        // Thumbnail foran bhejo (YouTube search se)
         try {
             await sock.sendMessage(chatId, {
                 image: { url: songData.thumbnail },
                 caption: box('🎵 ꜱᴏɴɢ ꜰᴏᴜɴᴅ', [
-                    `📌 ᴛɪᴛʟᴇ : ${trim(arslanInfo.title, 38)}`,
+                    `📌 ᴛɪᴛʟᴇ : ${trim(songData.title, 38)}`,
                     `⏱️ ᴅᴜʀᴀᴛɪᴏɴ : ${songData.timestamp || 'N/A'}`,
                     `📺 ᴄʜᴀɴɴᴇʟ : ${trim(songData.author, 25)}`,
-                    `🎚️ ǫᴜᴀʟɪᴛʏ : ${arslanInfo.quality}`,
                     '━━━━━━━━━━━━━━━━━━',
                     '⚡ ᴜʟᴛʀᴀ ꜰᴀꜱᴛ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ...'
                 ]),
@@ -222,12 +196,12 @@ async function songCommand(sock, chatId, message) {
         } catch (bufferError) {
             console.error('Buffer failed:', bufferError.message);
 
-            // Fallback: direct URL from Hector
+            // Fallback: direct URL
             try {
                 await sock.sendMessage(chatId, {
                     audio: { url: hectorData.audio },
                     mimetype: 'audio/mpeg',
-                    fileName: `${arslanInfo.title.replace(/[^\w\s-]/g, '')}.mp3`,
+                    fileName: `${songData.title.replace(/[^\w\s-]/g, '')}.mp3`,
                     ptt: false,
                     ...channelInfo
                 }, { quoted: message });
@@ -247,12 +221,12 @@ async function songCommand(sock, chatId, message) {
         }
 
         // ═══════════════════════════════════════
-        // STEP 5: SEND AUDIO
+        // STEP 5: SEND AUDIO (FAST)
         // ═══════════════════════════════════════
         await sock.sendMessage(chatId, {
             audio: audioBuffer,
             mimetype: 'audio/mpeg',
-            fileName: `${arslanInfo.title.replace(/[^\w\s-]/g, '')}.mp3`,
+            fileName: `${songData.title.replace(/[^\w\s-]/g, '')}.mp3`,
             ptt: false,
             ...channelInfo
         }, { quoted: message });
