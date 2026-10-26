@@ -372,18 +372,47 @@ async function startXeonBotInc(requestedPhoneNumber = '', requestedSessionKey = 
 
             try {
                 const botNumber = XeonBotInc.user.id.split(':')[0] + '@s.whatsapp.net';
+                
+                // ==========================================
+                // 🎯 VIP CONNECT MESSAGE (IMAGE + CAPTION)
+                // ==========================================
+                const connectCaption = 
+`*╭┈───〔 𝑀𝑼𝑍𝜦𝑀𝜤𝐋-𝑿𝑫 〕┈───⊷*
+*├✦ Status:* 🟢 Connected
+*├✦ Version:* 3.0.7
+*├✦ Mode:* Public
+*├✦ Prefix:* .
+*╰───────────────────⊷*
+
+\`『 OWNER INFO 』\`
+╭───────────────────⊷
+*┋ ⬡ 👑 𝗢𝘄𝗻𝗲𝗿 & 𝗗𝗶𝗿𝗲𝗰𝘁𝗼𝗿 : 𝐌ᴜᴢᴀᴍɪʟ*
+*┋ ⬡ 🚀 𝗖𝗿𝗲𝗮𝘁𝗲𝗱 𝗕𝘆 : TeamRedXhackers*
+╰───────────────────⊷
+
+\`『 CONNECTED SUCCESSFULLY 』\`
+╭───────────────────⊷
+*┋ ⬡ ✅ 𝗕𝗼𝘁 𝗶𝘀 𝗼𝗻𝗹𝗶𝗻𝗲 𝗮𝗻𝗱 𝗿𝗲𝗮𝗱𝘆!*
+*┋ ⬡ ⚡ 𝗦𝘆𝘀𝘁𝗲𝗺 𝘀𝗽𝗲𝗲𝗱 : Ultra Fast*
+*┋ ⬡ 💡 Type .menu to see all commands*
+╰───────────────────⊷
+
+> *© ᴘᴏᴡᴇʀᴇᴅ ʙʏ 𝑀𝑼𝑍𝜦𝑀𝜤𝐋-𝑿𝑫*`;
+
                 await XeonBotInc.sendMessage(botNumber, {
-                    text: `🤖 Bot Connected Successfully!\n\n⏰ Time: ${new Date().toLocaleString()}\n✅ Status: Online and Ready!\n\n✅Make sure to join below channel`,
+                    image: { url: global.botImageUrl || "https://i.ibb.co/zhBH3mzR/file-000000002ae08211834774ce8bc71642.png" },
+                    caption: connectCaption,
                     contextInfo: {
                         forwardingScore: 1,
                         isForwarded: true,
                         forwardedNewsletterMessageInfo: {
                             newsletterJid: '120363426106687970@newsletter',
-                            newsletterName: '𝑅𝑼𝛣𝜦𝛣 × 𝑀𝑼𝑍𝜦𝑀𝜤𝐋',
+                            newsletterName: '𝑀𝑼𝑍𝜦𝑀𝜤𝐋-𝑿𝑫',
                             serverMessageId: -1
                         }
                     }
                 });
+                // ==========================================
             } catch (error) {
                 console.error('Error sending connection message:', error.message)
             }
