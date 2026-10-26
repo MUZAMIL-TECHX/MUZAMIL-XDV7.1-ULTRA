@@ -69,6 +69,17 @@ function safeFileName(title) {
     return `${base || 'audio'}.mp3`;
 }
 
+function streamHttpError(status) {
+    const reason = status === 404
+        ? 'the link may be short-lived or invalid'
+        : status === 403
+            ? 'the provider denied access'
+            : 'the provider could not find the audio';
+    const error = new Error(`Audio host returned HTTP ${status}; ${reason}.`);
+    error.statusCode = status;
+    return error;
+}
+
 function isYouTubeUrl(value) {
     try {
         const parsed = new URL(value);
@@ -138,7 +149,7 @@ async function downloadBuffer(url) {
         });
     } catch (error) {
         if (error.response?.status) {
-            throw new Error(`Audio host returned HTTP ${error.response.status}; the link may have expired or access was denied. Request a fresh link from the provider.`);
+            throw streamHttpError(error.response.status);
         }
         if (error.code === 'ERR_BAD_RESPONSE' || /maxContentLength/i.test(error.message || '')) {
             throw new Error('The audio file exceeds the 64 MB limit.');
@@ -148,7 +159,7 @@ async function downloadBuffer(url) {
     }
 
     if (response.status < 200 || response.status >= 300) {
-        throw new Error(`Audio host returned HTTP ${response.status}; the link may have expired or access was denied. Request a fresh link from the provider.`);
+        throw streamHttpError(response.status);
     }
 
     const contentType = String(response.headers?.['content-type'] || '').toLowerCase();
@@ -222,11 +233,22 @@ async function songCommand(sock, chatId, message) {
         }
 
         await addReaction(sock, message, '⏳');
-        const apiData = await getArslanData(video.url);
+        let apiData = await getArslanData(video.url);
         await addReaction(sock, message, '📥');
-        await sendInfo(sock, chatId, message, video, apiData);
 
-        const audioBuffer = await downloadBuffer(apiData.audio);
+        // Download signed URLs before sending the optional thumbnail, since
+        // some providers issue links with a short lifetime.
+        let audioBuffer;
+        try {
+            audioBuffer = await downloadBuffer(apiData.audio);
+        } catch (error) {
+            if (error.statusCode !== 404) throw error;
+            // Ask the provider for one fresh link; do not proxy or bypass access controls.
+            apiData = await getArslanData(video.url);
+            audioBuffer = await downloadBuffer(apiData.audio);
+        }
+
+        await sendInfo(sock, chatId, message, video, apiData);
         await sock.sendMessage(chatId, {
             audio: audioBuffer,
             mimetype: 'audio/mpeg',
