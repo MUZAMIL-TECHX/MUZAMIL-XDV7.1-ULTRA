@@ -58,7 +58,6 @@ async function creatorCommand(sock, chatId, message) {
 
 ▸ 👤 ɴᴀᴍᴇ : ${name}
 ▸ 📱 ɴᴜᴍʙᴇʀ : ${number}
-▸ 📢 ʜᴀɴᴅʟᴇ : @Muzamil
 
 ━━━━━━━━━━━━━━━━━━━━
 ▸ 🔗 ᴡʜᴀᴛꜱᴀᴘᴘ ᴄʜᴀɴɴᴇʟ :
