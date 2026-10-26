@@ -69,23 +69,20 @@ async function getArslanData(youtubeUrl) {
 }
 
 // ═══════════════════════════════════════════════════════════
-//                    📥 ULTRA FAST BUFFER DOWNLOAD (NEW WAY)
+//                    📥 ULTRA FAST BUFFER (PROXY FIX)
 // ═══════════════════════════════════════════════════════════
 async function downloadBuffer(url) {
-    const response = await axios.get(url, {
+    // 🔥 Cloudflare Proxy bypass to prevent 403 Forbidden from 123tokyo
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+
+    const response = await axios.get(proxyUrl, {
         responseType: 'arraybuffer',
-        timeout: 90000, // 1.5 mins tak wait karega
+        timeout: 90000,
         maxContentLength: Infinity,
         maxBodyLength: Infinity,
         headers: {
-            // 🔥 Ye headers 123tokyo link ko bhatakne nahi dete
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'audio/webm,audio/ogg,audio/wav,audio/*;q=0.9,application/ogg;q=0.7,video/*;q=0.6,*/*;q=0.5',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'Accept-Encoding': 'identity', // 🔥 Ye zaroori hai warna file corrupt ho jati hai
-            'Range': 'bytes=0-',
-            'Connection': 'keep-alive',
-            'Referer': 'https://www.youtube.com/'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept': '*/*'
         }
     });
 
@@ -165,7 +162,7 @@ async function playCommand(sock, chatId, message) {
             }, { quoted: message });
         } catch (thumbErr) {}
 
-        // 4. Download Audio (Buffer)
+        // 4. Download Audio
         await addReaction(sock, message, '📥');
         let audioBuffer;
         
@@ -173,7 +170,7 @@ async function playCommand(sock, chatId, message) {
             audioBuffer = await downloadBuffer(apiData.audio);
         } catch (bufferErr) {
             console.error('Buffer failed:', bufferErr.message);
-            // Fallback: Agar buffer fail ho toh direct URL bhej do
+            // Fallback: Direct URL (might work sometimes)
             await sock.sendMessage(chatId, {
                 audio: { url: apiData.audio },
                 mimetype: 'audio/mpeg',
@@ -195,7 +192,6 @@ async function playCommand(sock, chatId, message) {
         }, { quoted: message });
 
         await addReaction(sock, message, '✅');
-        console.log(`✅ Song sent successfully!`);
 
     } catch (error) {
         console.error('❌ Play error:', error);
