@@ -4,7 +4,7 @@ const { getSessionSettings } = require('../lib/session_data');
 // ===============================
 // 🎯 BOT DP URL
 // ===============================
-const BOT_DP_URL = 'https://i.ibb.co/zhBH3mzR/file-000000002ae08211834774ce8bc71642.png';
+const DEFAULT_BOT_DP_URL = 'https://i.ibb.co/zhBH3mzR/file-000000002ae08211834774ce8bc71642.png';
 
 // ===============================
 // 🎯 MENU AUDIO URL
@@ -38,8 +38,9 @@ async function helpCommand(sock, chatId, message) {
     });
 
     const helpMessage = 
-`*╭┈───〔 𝑀𝑼𝑍𝜦𝑀𝜤𝐋-𝑿𝑫 〕┈───⊷*
+`*╭┈───〔 ${sessionSettings.botName || '𝑀𝑼𝑍𝜦𝑀𝜤𝐋-𝑿𝑫'} 〕┈───⊷*
 *├✦ Owner:* ${sessionSettings.ownerName || 'Muzamil'}
+*├✦ Owner number:* ${sessionSettings.ownerNumber || ''}
 *├✦ Version:* ${settings.version || '3.0.7'}
 *├✦ Team™:* ${global.ytch || 'TeamRedXhackers'}
 *├✦ Mode:* Public
@@ -246,12 +247,12 @@ async function helpCommand(sock, chatId, message) {
 *┋ ⬡ ʀᴇᴘᴏ*
 ╰───────────────────⊷
 
-> *© ᴘᴏᴡᴇʀᴇᴅ ʙʏ 𝑀𝑼𝑍𝜦𝑀𝜤𝐋-𝑿𝑫*`;
+> *© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ${sessionSettings.botName || '𝑀𝑼𝑍𝜦𝑀𝜤𝐋-𝑿𝑫'}*`;
 
     try {
         // ✅ 1st message: DP + Menu (caption)
         await sock.sendMessage(chatId, {
-            image: { url: BOT_DP_URL },
+            image: { url: sessionSettings.botDp || DEFAULT_BOT_DP_URL },
             caption: helpMessage,
             ...channelInfo
         }, { quoted: message });

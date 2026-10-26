@@ -1,7 +1,9 @@
 const settings = require("../settings");
+const { getSessionSettings } = require('../lib/session_data');
 
 async function aliveCommand(sock, chatId, message) {
     try {
+        const sessionSettings = getSessionSettings(sock);
         const uptime = process.uptime();
         const hours = Math.floor(uptime / 3600);
         const minutes = Math.floor((uptime % 3600) / 60);
@@ -12,7 +14,8 @@ async function aliveCommand(sock, chatId, message) {
    ⚡ 𝗕𝗢𝗧 𝗜𝗦 𝗔𝗟𝗜𝗩𝗘 ⚡
 ╰━━━━━━━━━━━━━━━╯
 
-▸ 🤖 𝗡𝗮𝗺𝗲   : 𝑀𝑼𝑍𝜦𝑀𝜤𝐋-𝑿𝑫
+▸ 🤖 𝗡𝗮𝗺𝗲   : ${sessionSettings.botName}
+▸ 👤 𝗢𝘄𝗻𝗲𝗿 : ${sessionSettings.ownerName}
 ▸ 📦 𝗩𝗲𝗿𝘀𝗶𝗼𝗻 : ${settings.version}
 ▸ 🟢 𝗦𝘁𝗮𝘁𝘂𝘀  : Online
 ▸ 🌐 𝗠𝗼𝗱𝗲    : Public
@@ -22,7 +25,7 @@ async function aliveCommand(sock, chatId, message) {
    🌟 𝗙𝗘𝗔𝗧𝗨𝗥𝗘𝗦
 ━━━━━━━━━━━━━━━━
 💡 Type *.menu* for full list
-👑 𝗕𝘆 : 𝑀𝑼𝑍𝜦𝑀𝜤𝐋-𝑿𝑫`;
+👑 𝗕𝘆 : ${sessionSettings.botName}`;
 
         await sock.sendMessage(chatId, {
             text: message1,

@@ -1,3 +1,5 @@
+const { getSessionSettings } = require('../lib/session_data');
+
 // ===============================
 // 🎯 CHANNEL INFO (FORWARD OFF)
 // ===============================
@@ -24,14 +26,16 @@ async function ownerCommand(sock, chatId, message) {
         // 👑 Reaction
         if (message) await addReaction(sock, message, '👑');
 
-        const number = '923130122643';
-        const name = '𝑀𝑼𝑍𝜦𝑀𝜤𝐋';
+        const sessionSettings = getSessionSettings(sock);
+        const number = sessionSettings.ownerNumber;
+        const name = sessionSettings.ownerName;
+        const botName = sessionSettings.botName;
         
         // 🪪 vCard Format (Contact Card)
         const vcard = 'BEGIN:VCARD\n' +
                       'VERSION:3.0\n' +
                       `FN:${name}\n` +
-                      `ORG:𝑀𝑼𝑍𝜦𝑀𝜤𝐋-𝑿𝑫\n` +
+                      `ORG:${botName}\n` +
                       `TEL;type=CELL;type=VOICE;waid=${number}:+${number}\n` +
                       'END:VCARD';
 
@@ -59,7 +63,7 @@ async function ownerCommand(sock, chatId, message) {
 ▸ https://whatsapp.com/channel/0029VbCkm3rAe5VzCYLtNb2u
 
 ━━━━━━━━━━━━━━━━━━━━
-   👑 𝗕𝘆 : 𝑀𝑼𝑍𝜦𝑀𝜤𝐋-𝑿𝑫`;
+   👑 𝗕𝘆 : ${botName}`;
 
         await sock.sendMessage(chatId, {
             text: replyText,
