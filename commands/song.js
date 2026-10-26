@@ -1,4 +1,5 @@
 const axios = require('axios');
+const yts = require('yt-search');
 
 // ═══════════════════════════════════════════════════════════
 //                    🎯 CHANNEL INFO (FORWARD OFF)
@@ -10,7 +11,7 @@ const channelInfo = {
     }
 };
 
-const HECTOR_API = 'https://yt-dl.officialhectormanuel.workers.dev/?url=';
+const ARSLAN_API = 'https://arslan-apis-v2.vercel.app/download/ytmp3?url=';
 
 // ═══════════════════════════════════════════════════════════
 //                    🛠️ HELPERS
@@ -45,7 +46,6 @@ function trim(str, n) {
 //                    🔍 SEARCH (yt-search)
 // ═══════════════════════════════════════════════════════════
 async function searchSong(query) {
-    const yts = require('yt-search');
     const { videos } = await yts(query);
     if (!videos || videos.length === 0) throw new Error('No results');
 
@@ -53,32 +53,31 @@ async function searchSong(query) {
     return {
         title: v.title,
         url: v.url,
-        videoId: v.videoId,
         thumbnail: v.thumbnail,
         timestamp: v.timestamp,
-        views: v.views,
         author: v.author?.name || 'Unknown'
     };
 }
 
 // ═══════════════════════════════════════════════════════════
-//                    🎵 HECTOR API
+//                    🎵 ARSLAN API
 // ═══════════════════════════════════════════════════════════
-async function getHectorData(youtubeUrl) {
-    const apiUrl = `${HECTOR_API}${encodeURIComponent(youtubeUrl)}`;
+async function getArslanData(youtubeUrl) {
+    const apiUrl = `${ARSLAN_API}${encodeURIComponent(youtubeUrl)}`;
     const response = await axios.get(apiUrl, {
         timeout: 30000,
         headers: { 'User-Agent': 'Mozilla/5.0' }
     });
 
-    if (!response.data.status || !response.data.audio) {
-        throw new Error('Hector API failed');
+    if (!response.data?.status || !response.data?.result?.download?.url) {
+        throw new Error('Arslan API failed');
     }
 
+    const result = response.data.result;
     return {
-        title: response.data.title || 'Audio',
-        thumbnail: response.data.thumbnail,
-        audio: response.data.audio
+        title: result.metadata?.title || 'Audio',
+        quality: result.metadata?.quality || '128k',
+        audio: result.download.url
     };
 }
 
@@ -86,7 +85,6 @@ async function getHectorData(youtubeUrl) {
 //                    📥 BUFFER DOWNLOAD (ULTRA FAST)
 // ═══════════════════════════════════════════════════════════
 async function downloadBuffer(url) {
-    // ⚡ Ultra fast: direct stream to buffer, no decompression delays
     const response = await axios.get(url, {
         responseType: 'arraybuffer',
         timeout: 120000,
@@ -124,7 +122,7 @@ async function songCommand(sock, chatId, message) {
                 text: box('🎵 ꜱᴏɴɢ ᴅʟ', [
                     '📌 ᴜꜱᴀɢᴇ : .ꜱᴏɴɢ [ɴᴀᴍᴇ/ʟɪɴᴋ]',
                     '🔍 ᴇxᴀᴍᴘʟᴇ 1 : .ꜱᴏɴɢ ᴘᴀꜱᴏᴏʀɪ',
-                    '🔍 ᴇxᴀᴍᴘʟᴇ 2 : .ꜱᴏɴɢ ᴀᴛɪꜰ ᴀꜱʟᴀᴍ',
+                    '🔍 ᴇxᴀᴍᴘʟᴇ 2 : .ꜱᴏɴɢ ʟᴇʟᴇɴᴀ',
                     '━━━━━━━━━━━━━━━━━━',
                     '🎧 ꜰᴏʀᴍᴀᴛ : ᴍᴘ3 (128ᴋ)',
                     '⚡ ᴍᴏᴅᴇ : ᴜʟᴛʀᴀ ꜰᴀꜱᴛ'
@@ -155,12 +153,12 @@ async function songCommand(sock, chatId, message) {
         await addReaction(sock, message, '⏳');
 
         // ═══════════════════════════════════════
-        // STEP 2: HECTOR API
+        // STEP 2: ARSLAN API
         // ═══════════════════════════════════════
-        let hectorData;
+        let apiData;
         try {
-            hectorData = await getHectorData(songData.url);
-        } catch (hectorError) {
+            apiData = await getArslanData(songData.url);
+        } catch (apiError) {
             await addReaction(sock, message, '❌');
             return await sock.sendMessage(chatId, {
                 text: box('❌ ᴀᴘɪ ꜰᴀɪʟᴇᴅ', [
@@ -176,18 +174,18 @@ async function songCommand(sock, chatId, message) {
         // ═══════════════════════════════════════
         await addReaction(sock, message, '🖼️');
 
-        // ⚡ Start buffer download IN PARALLEL with thumbnail send
-        const bufferPromise = downloadBuffer(hectorData.audio);
+        // Start download in parallel (background)
+        const bufferPromise = downloadBuffer(apiData.audio);
 
-        // Send thumbnail (don't wait for download to finish)
+        // Send thumbnail
         try {
-            const thumbnailUrl = hectorData.thumbnail || songData.thumbnail;
             await sock.sendMessage(chatId, {
-                image: { url: thumbnailUrl },
+                image: { url: songData.thumbnail },
                 caption: box('🎵 ꜱᴏɴɢ ꜰᴏᴜɴᴅ', [
-                    `📌 ᴛɪᴛʟᴇ : ${trim(hectorData.title, 38)}`,
+                    `📌 ᴛɪᴛʟᴇ : ${trim(apiData.title, 38)}`,
                     `⏱️ ᴅᴜʀᴀᴛɪᴏɴ : ${songData.timestamp || 'N/A'}`,
                     `📺 ᴄʜᴀɴɴᴇʟ : ${trim(songData.author, 25)}`,
+                    `🎚️ ǫᴜᴀʟɪᴛʏ : ${apiData.quality}`,
                     '━━━━━━━━━━━━━━━━━━',
                     '⚡ ᴜʟᴛʀᴀ ꜰᴀꜱᴛ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ...'
                 ]),
@@ -211,9 +209,9 @@ async function songCommand(sock, chatId, message) {
             // Fallback: direct URL
             try {
                 await sock.sendMessage(chatId, {
-                    audio: { url: hectorData.audio },
+                    audio: { url: apiData.audio },
                     mimetype: 'audio/mpeg',
-                    fileName: `${hectorData.title.replace(/[^\w\s-]/g, '')}.mp3`,
+                    fileName: `${apiData.title.replace(/[^\w\s-]/g, '')}.mp3`,
                     ptt: false,
                     ...channelInfo
                 }, { quoted: message });
@@ -233,12 +231,12 @@ async function songCommand(sock, chatId, message) {
         }
 
         // ═══════════════════════════════════════
-        // STEP 5: SEND AUDIO (ULTRA FAST)
+        // STEP 5: SEND AUDIO
         // ═══════════════════════════════════════
         await sock.sendMessage(chatId, {
             audio: audioBuffer,
             mimetype: 'audio/mpeg',
-            fileName: `${hectorData.title.replace(/[^\w\s-]/g, '')}.mp3`,
+            fileName: `${apiData.title.replace(/[^\w\s-]/g, '')}.mp3`,
             ptt: false,
             ...channelInfo
         }, { quoted: message });
