@@ -202,10 +202,15 @@ async function startXeonBotInc(requestedPhoneNumber = '', requestedSessionKey = 
         XeonBotInc.dataDir = join(authDir, 'data')
         ensureSessionDataDir(XeonBotInc)
         const legacyBranding = readSessionJson(XeonBotInc, 'branding.json', {})
+        const persistedSessionSettings = readSessionJson(XeonBotInc, 'sessionSettings.json', {})
         const sessionSettings = {
             ...getSessionSettings(XeonBotInc),
-            ...(legacyBranding.name ? { botName: legacyBranding.name } : {}),
-            ...(legacyBranding.imageUrl ? { botDp: legacyBranding.imageUrl } : {})
+            ...(legacyBranding.name && !persistedSessionSettings.botName
+                ? { botName: legacyBranding.name }
+                : {}),
+            ...(legacyBranding.imageUrl && !persistedSessionSettings.botDp
+                ? { botDp: legacyBranding.imageUrl }
+                : {})
         }
         XeonBotInc.botname = sessionSettings.botName
         XeonBotInc.botImageUrl = sessionSettings.botDp

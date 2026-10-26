@@ -621,9 +621,9 @@ async function handleMessages(sock, messageUpdate, printLog) {
                     await sock.sendMessage(chatId, { text: 'Failed to update bot access mode', ...channelInfo });
                 }
                 break;
-            case userMessage.startsWith('.botname'):
+            case userMessage === '.botname' || userMessage.startsWith('.botname '):
                 {
-                    const botName = rawText.slice('.botname'.length).trim();
+                    const botName = commandArgument(rawText, '\\.botname');
                     if (!botName || botName.length > 50) {
                         await sock.sendMessage(chatId, {
                             text: 'Usage: .botname <name> (maximum 50 characters)',
@@ -639,12 +639,12 @@ async function handleMessages(sock, messageUpdate, printLog) {
                     }, { quoted: message });
                 }
                 break;
-            case userMessage.startsWith('.botdp'):
+            case userMessage === '.botdp' || userMessage.startsWith('.botdp '):
                 {
-                    const imageUrl = rawText.slice('.botdp'.length).trim();
-                    if (!/^https?:\/\/\S+$/i.test(imageUrl)) {
+                    const imageUrl = commandArgument(rawText, '\\.botdp');
+                    if (!/^https:\/\/\S+$/i.test(imageUrl)) {
                         await sock.sendMessage(chatId, {
-                            text: 'Usage: .botdp <public image URL>',
+                            text: 'Usage: .botdp <public HTTPS image URL>',
                             ...channelInfo
                         }, { quoted: message });
                         break;
