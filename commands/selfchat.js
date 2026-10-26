@@ -29,7 +29,7 @@ async function addReaction(sock, message, emoji) {
 function box(title, lines = []) {
     let out = `╭┈──〔 ${title} 〕┈──⊷\n`;
     for (const l of lines) out += `┋⋄ ➠ ${l}\n`;
-    out += `╰─────────────────────⊷\n\n      𝗕𝘆 : 𝑅𝑼𝛣𝜦𝛣 × 𝑀𝑼𝑍𝜦𝑀𝛤𝐋`;
+    out += `╰─────────────────────⊷\n\n      𝗕𝘆 : 𝐌ᴜᴢᴀᴍɪʟ-𝐗𝐃☠️🚩`;
     return out;
 }
 
