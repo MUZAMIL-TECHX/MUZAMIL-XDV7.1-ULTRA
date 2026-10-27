@@ -41,7 +41,7 @@ async function helpCommand(sock, chatId, message) {
 `*╭┈───〔 ${sessionSettings.botName || '𝑀𝑼𝑍𝜦𝑀𝜤𝐋-𝑿𝑫'} 〕┈───⊷*
 *├✦ Owner:* ${sessionSettings.ownerName || 'Muzamil'}
 *├✦ Owner number:* ${sessionSettings.ownerNumber || ''}
-*├✦ Version:* ${settings.version || '3.0.7'}
+*├✦ Version:* ${settings.version || 'V7 Offically'}
 *├✦ Team™:* ${global.ytch || 'TeamRedXhackers'}
 *├✦ Mode:* Public
 *╰───────────────────⊷*
