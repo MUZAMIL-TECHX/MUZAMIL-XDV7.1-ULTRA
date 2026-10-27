@@ -75,8 +75,8 @@ async function simdataCommand(sock, chatId, message, input) {
         await addReaction(sock, message, '🔄');
         await sock.sendPresenceUpdate('composing', chatId);
 
-        // ✅ NEW API from HTML
-        const apiUrl = `https://sim-db-api.faizankhichi.me/?search=${cleanInput}`;
+        // ✅ NEW API - WasifAli
+        const apiUrl = `https://wasifali.biz.id/public_apis/sim-info-api.php?search=${cleanInput}`;
         console.log(`[SIM DATA] Requesting: ${apiUrl}`);
 
         const response = await axios.get(apiUrl, {
@@ -89,8 +89,8 @@ async function simdataCommand(sock, chatId, message, input) {
 
         const data = response.data;
 
-        // ✅ Check API response (HTML format: { data: [...] })
-        if (!data || !data.data || !Array.isArray(data.data) || data.data.length === 0) {
+        // ✅ Check API response
+        if (!data || !data.success || !data.records || !Array.isArray(data.records) || data.records.length === 0) {
             await addReaction(sock, message, '❌');
             await sock.sendMessage(chatId, {
                 text: box('❌ ɴᴏ ᴅᴀᴛᴀ ꜰᴏᴜɴᴅ', [
@@ -102,8 +102,8 @@ async function simdataCommand(sock, chatId, message, input) {
             return;
         }
 
-        const records = data.data;
-        const totalCount = records.length;
+        const records = data.records;
+        const totalCount = data.count || records.length;
 
         // Build stylish response
         let reply = `╭┈──〔 📊 sɪᴍ ᴅᴀᴛᴀ ʀᴇsᴜʟᴛ 〕┈──⊷\n`;
@@ -112,10 +112,11 @@ async function simdataCommand(sock, chatId, message, input) {
         reply += `╰─────────────────────⊷\n\n`;
 
         records.forEach((record, index) => {
-            const name = record.nam || 'Unknown';
-            const mobile = record.nbr || 'N/A';
-            const cnic = record.cni || 'N/A';
-            const address = record.adr || 'N/A';
+            const name = record.name || 'Unknown';
+            const mobile = record.mobile || 'N/A';
+            const cnic = record.cnic || 'N/A';
+            const address = record.address || 'N/A';
+            const network = record.network || 'Unknown';
 
             // Format CNIC
             const formattedCnic = cnic !== 'N/A' && cnic !== 'NO' && cnic.length === 13 
@@ -132,6 +133,16 @@ async function simdataCommand(sock, chatId, message, input) {
                               name === 'DATA NOT RECIEVED FROM NADRA' || 
                               name === 'NO DATA' ||
                               name === 'Unknown';
+
+            // Network emoji
+            let networkEmoji = '📶';
+            const netLower = (network || '').toLowerCase();
+            if (netLower.includes('jazz')) networkEmoji = '🟠';
+            else if (netLower.includes('zong')) networkEmoji = '🔴';
+            else if (netLower.includes('ufone')) networkEmoji = '🟢';
+            else if (netLower.includes('telenor')) networkEmoji = '🔵';
+            else if (netLower.includes('warid')) networkEmoji = '🟣';
+            else if (netLower.includes('ptcl')) networkEmoji = '🟡';
 
             reply += `╭┈──〔 👤 ʀᴇᴄᴏʀᴅ #${index + 1} 〕┈──⊷\n`;
             
@@ -154,6 +165,12 @@ async function simdataCommand(sock, chatId, message, input) {
                 reply += `┋⋄ ➠ 📍 ᴀᴅᴅʀᴇss : ${shortAddress}\n`;
             } else {
                 reply += `┋⋄ ➠ 📍 ᴀᴅᴅʀᴇss : ❌ ɴ/ᴀ\n`;
+            }
+
+            if (network && network !== 'Unknown' && network !== 'N/A') {
+                reply += `┋⋄ ➠ ${networkEmoji} ɴᴇᴛᴡᴏʀᴋ : ${network}\n`;
+            } else {
+                reply += `┋⋄ ➠ 📶 ɴᴇᴛᴡᴏʀᴋ : ❌ ɴ/ᴀ\n`;
             }
             
             reply += `╰─────────────────────⊷\n\n`;
