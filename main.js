@@ -547,141 +547,141 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 await creatorCommand(sock, chatId, message);
                 commandExecuted = true;
                break;
-           case userMessage.startsWith('.fetch'):
+            case userMessage.startsWith('.fetch'):
               await fetchCommand(sock, chatId, message);
               commandExecuted = true;
               break;
-              case userMessage.startsWith('.quran') ||
-    userMessage.startsWith('.surah') ||
-    userMessage.startsWith('.fatiha') ||
-    userMessage.startsWith('.fatihah') ||
-    userMessage.startsWith('.baqarah') ||
-    userMessage.startsWith('.baqara') ||
-    userMessage.startsWith('.imran') ||
-    userMessage.startsWith('.nisa') ||
-    userMessage.startsWith('.maidah') ||
-    userMessage.startsWith('.maida') ||
-    userMessage.startsWith('.anam') ||
-    userMessage.startsWith('.araf') ||
-    userMessage.startsWith('.anfal') ||
-    userMessage.startsWith('.tawbah') ||
-    userMessage.startsWith('.tauba') ||
-    userMessage.startsWith('.yunus') ||
-    userMessage.startsWith('.hud') ||
-    userMessage.startsWith('.yusuf') ||
-    userMessage.startsWith('.rad') ||
-    userMessage.startsWith('.ibrahim') ||
-    userMessage.startsWith('.hijr') ||
-    userMessage.startsWith('.nahl') ||
-    userMessage.startsWith('.isra') ||
-    userMessage.startsWith('.kahf') ||
-    userMessage.startsWith('.maryam') ||
-    userMessage.startsWith('.taha') ||
-    userMessage.startsWith('.anbiya') ||
-    userMessage.startsWith('.hajj') ||
-    userMessage.startsWith('.muminun') ||
-    userMessage.startsWith('.nur') ||
-    userMessage.startsWith('.furqan') ||
-    userMessage.startsWith('.shuara') ||
-    userMessage.startsWith('.naml') ||
-    userMessage.startsWith('.qasas') ||
-    userMessage.startsWith('.ankabut') ||
-    userMessage.startsWith('.rum') ||
-    userMessage.startsWith('.luqman') ||
-    userMessage.startsWith('.sajda') ||
-    userMessage.startsWith('.ahzab') ||
-    userMessage.startsWith('.saba') ||
-    userMessage.startsWith('.fatir') ||
-    userMessage.startsWith('.yasin') ||
-    userMessage.startsWith('.yaseen') ||
-    userMessage.startsWith('.saffat') ||
-    userMessage.startsWith('.sad') ||
-    userMessage.startsWith('.zumar') ||
-    userMessage.startsWith('.ghafir') ||
-    userMessage.startsWith('.fussilat') ||
-    userMessage.startsWith('.shura') ||
-    userMessage.startsWith('.zukhruf') ||
-    userMessage.startsWith('.dukhan') ||
-    userMessage.startsWith('.jathiyah') ||
-    userMessage.startsWith('.ahqaf') ||
-    userMessage.startsWith('.muhammad') ||
-    userMessage.startsWith('.fath') ||
-    userMessage.startsWith('.hujurat') ||
-    userMessage.startsWith('.qaf') ||
-    userMessage.startsWith('.dhariyat') ||
-    userMessage.startsWith('.tur') ||
-    userMessage.startsWith('.najm') ||
-    userMessage.startsWith('.qamar') ||
-    userMessage.startsWith('.rahman') ||
-    userMessage.startsWith('.rehman') ||
-    userMessage.startsWith('.waqia') ||
-    userMessage.startsWith('.hadid') ||
-    userMessage.startsWith('.mujadila') ||
-    userMessage.startsWith('.hashr') ||
-    userMessage.startsWith('.mumtahanah') ||
-    userMessage.startsWith('.saff') ||
-    userMessage.startsWith('.jumuah') ||
-    userMessage.startsWith('.juma') ||
-    userMessage.startsWith('.munafiqun') ||
-    userMessage.startsWith('.taghabun') ||
-    userMessage.startsWith('.talaq') ||
-    userMessage.startsWith('.tahrim') ||
-    userMessage.startsWith('.mulk') ||
-    userMessage.startsWith('.qalam') ||
-    userMessage.startsWith('.haqqah') ||
-    userMessage.startsWith('.maarij') ||
-    userMessage.startsWith('.nuh') ||
-    userMessage.startsWith('.jinn') ||
-    userMessage.startsWith('.muzzammil') ||
-    userMessage.startsWith('.muddathir') ||
-    userMessage.startsWith('.qiyamah') ||
-    userMessage.startsWith('.insan') ||
-    userMessage.startsWith('.mursalat') ||
-    userMessage.startsWith('.naba') ||
-    userMessage.startsWith('.naziat') ||
-    userMessage.startsWith('.abasa') ||
-    userMessage.startsWith('.takwir') ||
-    userMessage.startsWith('.infitar') ||
-    userMessage.startsWith('.mutaffifin') ||
-    userMessage.startsWith('.inshiqaq') ||
-    userMessage.startsWith('.buruj') ||
-    userMessage.startsWith('.tariq') ||
-    userMessage.startsWith('.ala') ||
-    userMessage.startsWith('.ghashiyah') ||
-    userMessage.startsWith('.fajr') ||
-    userMessage.startsWith('.balad') ||
-    userMessage.startsWith('.shams') ||
-    userMessage.startsWith('.layl') ||
-    userMessage.startsWith('.duha') ||
-    userMessage.startsWith('.sharh') ||
-    userMessage.startsWith('.inshirah') ||
-    userMessage.startsWith('.tin') ||
-    userMessage.startsWith('.alaq') ||
-    userMessage.startsWith('.qadr') ||
-    userMessage.startsWith('.bayyinah') ||
-    userMessage.startsWith('.zalzalah') ||
-    userMessage.startsWith('.adiyat') ||
-    userMessage.startsWith('.qariah') ||
-    userMessage.startsWith('.takathur') ||
-    userMessage.startsWith('.takasur') ||
-    userMessage.startsWith('.asr') ||
-    userMessage.startsWith('.humazah') ||
-    userMessage.startsWith('.fil') ||
-    userMessage.startsWith('.quraysh') ||
-    userMessage.startsWith('.quraish') ||
-    userMessage.startsWith('.maun') ||
-    userMessage.startsWith('.kawthar') ||
-    userMessage.startsWith('.kausar') ||
-    userMessage.startsWith('.kafirun') ||
-    userMessage.startsWith('.nasr') ||
-    userMessage.startsWith('.lahab') ||
-    userMessage.startsWith('.ikhlas') ||
-    userMessage.startsWith('.ikhlaas') ||
-    userMessage.startsWith('.falaq') ||
-    userMessage.startsWith('.nas'):
-    await quranCommand(sock, chatId, message);
-    commandExecuted = true;
-    break;
+            case userMessage.startsWith('.quran') ||
+              userMessage.startsWith('.surah') ||
+              userMessage.startsWith('.fatiha') ||
+              userMessage.startsWith('.fatihah') ||
+              userMessage.startsWith('.baqarah') ||
+              userMessage.startsWith('.baqara') ||
+              userMessage.startsWith('.imran') ||
+              userMessage.startsWith('.nisa') ||
+              userMessage.startsWith('.maidah') ||
+              userMessage.startsWith('.maida') ||
+              userMessage.startsWith('.anam') ||
+              userMessage.startsWith('.araf') ||
+              userMessage.startsWith('.anfal') ||
+              userMessage.startsWith('.tawbah') ||
+              userMessage.startsWith('.tauba') ||
+              userMessage.startsWith('.yunus') ||
+              userMessage.startsWith('.hud') ||
+              userMessage.startsWith('.yusuf') ||
+              userMessage.startsWith('.rad') ||
+              userMessage.startsWith('.ibrahim') ||
+              userMessage.startsWith('.hijr') ||
+              userMessage.startsWith('.nahl') ||
+              userMessage.startsWith('.isra') ||
+              userMessage.startsWith('.kahf') ||
+              userMessage.startsWith('.maryam') ||
+              userMessage.startsWith('.taha') ||
+              userMessage.startsWith('.anbiya') ||
+              userMessage.startsWith('.hajj') ||
+              userMessage.startsWith('.muminun') ||
+              userMessage.startsWith('.nur') ||
+              userMessage.startsWith('.furqan') ||
+              userMessage.startsWith('.shuara') ||
+              userMessage.startsWith('.naml') ||
+              userMessage.startsWith('.qasas') ||
+              userMessage.startsWith('.ankabut') ||
+              userMessage.startsWith('.rum') ||
+              userMessage.startsWith('.luqman') ||
+              userMessage.startsWith('.sajda') ||
+              userMessage.startsWith('.ahzab') ||
+              userMessage.startsWith('.saba') ||
+              userMessage.startsWith('.fatir') ||
+              userMessage.startsWith('.yasin') ||
+              userMessage.startsWith('.yaseen') ||
+              userMessage.startsWith('.saffat') ||
+              userMessage.startsWith('.sad') ||
+              userMessage.startsWith('.zumar') ||
+              userMessage.startsWith('.ghafir') ||
+              userMessage.startsWith('.fussilat') ||
+              userMessage.startsWith('.shura') ||
+              userMessage.startsWith('.zukhruf') ||
+              userMessage.startsWith('.dukhan') ||
+              userMessage.startsWith('.jathiyah') ||
+              userMessage.startsWith('.ahqaf') ||
+              userMessage.startsWith('.muhammad') ||
+              userMessage.startsWith('.fath') ||
+              userMessage.startsWith('.hujurat') ||
+              userMessage.startsWith('.qaf') ||
+              userMessage.startsWith('.dhariyat') ||
+              userMessage.startsWith('.tur') ||
+              userMessage.startsWith('.najm') ||
+              userMessage.startsWith('.qamar') ||
+              userMessage.startsWith('.rahman') ||
+              userMessage.startsWith('.rehman') ||
+              userMessage.startsWith('.waqia') ||
+              userMessage.startsWith('.hadid') ||
+              userMessage.startsWith('.mujadila') ||
+              userMessage.startsWith('.hashr') ||
+              userMessage.startsWith('.mumtahanah') ||
+              userMessage.startsWith('.saff') ||
+              userMessage.startsWith('.jumuah') ||
+              userMessage.startsWith('.juma') ||
+              userMessage.startsWith('.munafiqun') ||
+              userMessage.startsWith('.taghabun') ||
+              userMessage.startsWith('.talaq') ||
+              userMessage.startsWith('.tahrim') ||
+              userMessage.startsWith('.mulk') ||
+              userMessage.startsWith('.qalam') ||
+              userMessage.startsWith('.haqqah') ||
+              userMessage.startsWith('.maarij') ||
+              userMessage.startsWith('.nuh') ||
+              userMessage.startsWith('.jinn') ||
+              userMessage.startsWith('.muzzammil') ||
+              userMessage.startsWith('.muddathir') ||
+              userMessage.startsWith('.qiyamah') ||
+              userMessage.startsWith('.insan') ||
+              userMessage.startsWith('.mursalat') ||
+              userMessage.startsWith('.naba') ||
+              userMessage.startsWith('.naziat') ||
+              userMessage.startsWith('.abasa') ||
+              userMessage.startsWith('.takwir') ||
+              userMessage.startsWith('.infitar') ||
+              userMessage.startsWith('.mutaffifin') ||
+              userMessage.startsWith('.inshiqaq') ||
+              userMessage.startsWith('.buruj') ||
+              userMessage.startsWith('.tariq') ||
+              userMessage.startsWith('.ala') ||
+              userMessage.startsWith('.ghashiyah') ||
+              userMessage.startsWith('.fajr') ||
+              userMessage.startsWith('.balad') ||
+              userMessage.startsWith('.shams') ||
+              userMessage.startsWith('.layl') ||
+              userMessage.startsWith('.duha') ||
+              userMessage.startsWith('.sharh') ||
+              userMessage.startsWith('.inshirah') ||
+              userMessage.startsWith('.tin') ||
+              userMessage.startsWith('.alaq') ||
+              userMessage.startsWith('.qadr') ||
+              userMessage.startsWith('.bayyinah') ||
+              userMessage.startsWith('.zalzalah') ||
+              userMessage.startsWith('.adiyat') ||
+              userMessage.startsWith('.qariah') ||
+              userMessage.startsWith('.takathur') ||
+              userMessage.startsWith('.takasur') ||
+              userMessage.startsWith('.asr') ||
+              userMessage.startsWith('.humazah') ||
+              userMessage.startsWith('.fil') ||
+              userMessage.startsWith('.quraysh') ||
+              userMessage.startsWith('.quraish') ||
+              userMessage.startsWith('.maun') ||
+              userMessage.startsWith('.kawthar') ||
+              userMessage.startsWith('.kausar') ||
+              userMessage.startsWith('.kafirun') ||
+              userMessage.startsWith('.nasr') ||
+              userMessage.startsWith('.lahab') ||
+              userMessage.startsWith('.ikhlas') ||
+              userMessage.startsWith('.ikhlaas') ||
+              userMessage.startsWith('.falaq') ||
+              userMessage.startsWith('.nas'):
+              await quranCommand(sock, chatId, message);
+              commandExecuted = true;
+               break;
            case userMessage.startsWith('.truecaller'):
               const number = rawText.slice('.truecaller'.length).trim();
                await truecallerCommand(sock, chatId, message, number);
@@ -691,14 +691,14 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 await stickerCommand(sock, chatId, message);
                 commandExecuted = true;
                 break;
-                case userMessage.startsWith('.wiki') ||
-     userMessage.startsWith('.wp') ||
-     userMessage.startsWith('.wikipedia') ||
-     userMessage.startsWith('.info') ||
-     userMessage.startsWith('.defind') ||
-     userMessage.startsWith('.define'):
-    await wikiCommand(sock, chatId, message);
-    commandExecuted = true;
+            case userMessage.startsWith('.wiki') ||
+                 userMessage.startsWith('.wp') ||
+                 userMessage.startsWith('.wikipedia') ||
+                 userMessage.startsWith('.info') ||
+                 userMessage.startsWith('.defind') ||
+                 userMessage.startsWith('.define'):
+                 await wikiCommand(sock, chatId, message);
+                 commandExecuted = true;
                 break;
             case userMessage.startsWith('.warnings'):
                 const mentionedJidListWarnings = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
