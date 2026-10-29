@@ -1,4 +1,4 @@
-const { igdl } = require("ruhend-scraper");
+const axios = require('axios');
 
 // ═══════════════════════════════════════════════════════════
 //                    🎯 CHANNEL INFO (FORWARD ON)
@@ -41,19 +41,6 @@ function box(title, lines = []) {
     out += `\n━━━━━━━━━━━━━━━━━━━━\n`;
     out += `   👑 𝗕𝘆 : 𝑀𝑼𝑍𝜦𝑀𝜤𝐋-𝑿𝑫`;
     return out;
-}
-
-function extractUniqueMedia(mediaData) {
-    const uniqueMedia = [];
-    const seenUrls = new Set();
-    for (const media of mediaData) {
-        if (!media.url) continue;
-        if (!seenUrls.has(media.url)) {
-            seenUrls.add(media.url);
-            uniqueMedia.push(media);
-        }
-    }
-    return uniqueMedia;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -113,10 +100,19 @@ async function instagramCommand(sock, chatId, message) {
 
         await addReaction(sock, message, '🔄');
 
-        const downloadData = await igdl(url);
+        // ✅ NEW API - Aswin Sparky
+        const apiUrl = `https://api-aswin-sparky.koyeb.app/api/downloader/igdl?url=${encodeURIComponent(url)}`;
+        console.log(`[INSTAGRAM] Requesting: ${apiUrl}`);
+
+        const response = await axios.get(apiUrl, {
+            timeout: 30000,
+            headers: { 'User-Agent': 'Mozilla/5.0' }
+        });
+
+        const data = response.data;
 
         // ❌ No media
-        if (!downloadData || !downloadData.data || downloadData.data.length === 0) {
+        if (!data.status || !data.data || data.data.length === 0) {
             await addReaction(sock, message, '❌');
             return await sock.sendMessage(chatId, {
                 text: box('❌ ɴᴏ ᴍᴇᴅɪᴀ ꜰᴏᴜɴᴅ', [
@@ -130,19 +126,8 @@ async function instagramCommand(sock, chatId, message) {
             }, { quoted: message });
         }
 
-        const mediaData = downloadData.data;
-        const uniqueMedia = extractUniqueMedia(mediaData);
-        const mediaToDownload = uniqueMedia.slice(0, 20);
-
-        if (mediaToDownload.length === 0) {
-            await addReaction(sock, message, '❌');
-            return await sock.sendMessage(chatId, {
-                text: box('❌ ɴᴏ ᴠᴀʟɪᴅ ᴍᴇᴅɪᴀ', [
-                    '🔴 ɴᴏ ᴠᴀʟɪᴅ ᴍᴇᴅɪᴀ ꜰᴏᴜɴᴅ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ'
-                ]),
-                ...channelInfo
-            }, { quoted: message });
-        }
+        const mediaData = data.data;
+        const mediaToDownload = mediaData.slice(0, 20);
 
         // ⏳ Downloading status
         await sock.sendMessage(chatId, {
@@ -161,8 +146,7 @@ async function instagramCommand(sock, chatId, message) {
                 const media = mediaToDownload[i];
                 const mediaUrl = media.url;
 
-                const isVideo = /\.(mp4|mov|avi|mkv|webm)$/i.test(mediaUrl) ||
-                              media.type === 'video' ||
+                const isVideo = media.type === 'video' ||
                               url.includes('/reel/') ||
                               url.includes('/tv/');
 
